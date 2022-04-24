@@ -14,7 +14,30 @@ def find_sub_graph(G, S_):
     return Graph(edges_n, S1_n, S2_n)
 
 
-def attr(B_, G_): pass
+def attr(l, U, G):
+    i = 0
+    R_ = {}
+    R_[i] = U
+
+    S_f = G.S1 if l==1 else G.S2
+    S_s = G.S2 if l==1 else G.S1
+
+    while 1:
+        R_temp1, R_temp2 = [], []
+        for s in S_f:
+            if set(G.E(s)).intersection(R_[i]):
+                R_temp1.append(s)
+        for s in S_s:
+            if set(G.E(s)).issubset(R_[i]):
+                R_temp2.append(s)
+        
+        R_[i+1] = list(set(R_temp1)) + list(set(R_temp2)) + list(set(R_[i]))
+        if R_[i+1] == R_[i]:
+            break
+        i = i + 1
+
+    return R_[i+1]
+
 
 
 def play_buchi_game(G, B):
