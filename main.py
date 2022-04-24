@@ -1,25 +1,20 @@
-from cmath import log
+from graph import Graph
 from input import get_input
-from math import log
 
-def source(W, G):
-    s = {}
-    for node in G.S:
-        for succ_node in G.E[node]:
-            if succ_node in W:
-                s.add(node)
-                break
+def find_sub_graph(G, S_):
+    edges_n = {}
+    for s in S_:
+        if s in G.E:
+            edges_n[s] = []
+            for n in G.E[s]:
+                if n in S_:
+                    edges_n[s].append(n)
+    S1_n = [s for s in G.S1 if s in S_]
+    S2_n = [s for s in G.S2 if s in S_]
+    return Graph(edges_n, S1_n, S2_n)
 
 
 def attr(B_, G_): pass
-
-
-def avoid_set_classical(G_, B_, S_, i):
-    R = attr(1, B_, G_[i])
-    Tr = [s for s in S_[i] if s not in R]
-    W = attr(2, Tr, G_[i])
-    return W
-
 
 
 def play_buchi_game(G, B):
@@ -31,17 +26,43 @@ def play_buchi_game(G, B):
     C = [s for s in G.S if s not in B]
     W_ = {}
     W_[i] = []
-    
 
     while (i!=0 or len(W_[i])==0):
-        if (len(source(W_[i], G))) >= G.m/log(G.n):
-            W_[i+1] = avoid_set_classical(G_[i], set(B).intersection(S_[i]))
-        else: pass
+        C_, C1_, C2_ = [], [], []
 
+        C_ = set(C).intersection(S_[i]) 
+
+        for s in set(G.S1).intersection(C_[i]):
+            if set(G.E[s]).intersection(S_[i]).issubset(C_[i]):
+                C1_.append(s)
+        
+        for s in set(G.S2).intersection(C_[i]):
+            if set(G.E[s]).intersection(C_[i]):
+                C2_.append(s)
+
+        X_ = attr(2, C1_[i] + C2_[i], G_[i])
+        Z_ = set(X_[i]).intersection(C_[i])
+
+        S_wo_Z = [s for s in S_[i] if s not in Z_]
+        X_wo_Z = [s for s in X_ if s not in Z_]
+
+        D_temp1, D_temp2 = [], []
+        for s in set(G.S1).intersection(Z_):
+            if set(G.E[s]).intersection(S_[i]).intersection(S_wo_Z):
+                D_temp1.append(s)
+        for s in set(G.S2).intersection(Z_):
+            if set(G.E[s]).intersection(S_[i]).issubset(X_wo_Z + S_wo_Z):
+                D_temp2.append(s)
+        D = D_temp1 + D_temp2
+
+        G_X = find_sub_graph(G_[i], X_)
+
+        L = attr(1, D, G_X)
+        Tr = [s for s in Z_ if s not in L]
+        W_[i+1] = attr(2, Tr, G_[i])
         S_[i+1] = [s for s in S_[i] if s not in W_[i+1]]
-        # G_[i+1] = G
+        G_[i+1] = find_sub_graph(G, S_[i+1])
         i = i + 1
-
     
 
 if __name__ == "__main__":
