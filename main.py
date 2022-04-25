@@ -1,12 +1,6 @@
 from graph import Graph
 from input import get_input
-
-
-def print_nodes(txt, S):
-    print(f"Printing nodes for {txt}:")
-    for s in S:
-        print(s.index, end=", ")
-    print()
+from print_helper import print_nodes
 
 def find_sub_graph(G, S_):
     edges_n = {}
@@ -48,15 +42,6 @@ def attr(l, U, G):
         R = R + R_[j]
     return list(set(R))
 
-
-def print_graph(txt, G):
-    print_nodes(txt, G.S)
-    for n in G.E:
-        for nn in G.E[n]:
-            print(f"{n.index}->{nn.index}", end=", ")
-    print()
-    print_nodes(f"{txt} S1", G.S1)
-    print_nodes(f"{txt} S2", G.S2)
 
 def play_buchi_game(G, B):
     i = 0
@@ -112,8 +97,10 @@ def play_buchi_game(G, B):
 
 
 if __name__ == "__main__":
-    G, B = get_input(4)
-
-    winning_set = play_buchi_game(G, B)
-    print_nodes("winning set for player 1", winning_set)
+    testcase = input("Enter testcase number: ")
+    G, B = get_input(int(testcase))
+    
+    if G and B:
+        winning_set = play_buchi_game(G, B)
+        print_nodes("winning set for player 1", winning_set)
     

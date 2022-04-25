@@ -92,11 +92,14 @@ def make_arbitrary_graph4():
 
 def get_input(i):
     if i == 1:
-        G, B = make_arbitrary_graph1()
-    if i == 2:
-        G, B = make_arbitrary_graph2()
-    if i == 3:
-        G, B = make_arbitrary_graph3()
-    if i == 4:
-        G, B = make_arbitrary_graph4() 
-    return G, B
+        return make_arbitrary_graph1()
+    elif i == 2:
+        return make_arbitrary_graph2()
+    elif i == 3:
+        return make_arbitrary_graph3()
+    elif i == 4:
+        return make_arbitrary_graph4() 
+    else:
+        print(f'Invalid testcase number {i}')
+        return None, None
+        
