@@ -42,9 +42,11 @@ def attr(l, U, G):
         if R_[i+1] == R_[i]:
             break
         i = i + 1
-
     
-    return R_[i+1]
+    R = []
+    for j in range(0, i+1):
+        R = R + R_[j]
+    return list(set(R))
 
 
 def print_graph(txt, G):
@@ -66,75 +68,52 @@ def play_buchi_game(G, B):
     W_ = {}
     W_[i] = []
 
-    while (i<=10):
+    while ((i!=0 and len(W_[i])!=0) or i==0):
         C_, C1_, C2_ = [], [], []
-
         C_ = set(C).intersection(S_[i])
-        print_nodes("C_", C_)
 
         for s in set(G.S1).intersection(C_):
             if set(G.E[s]).intersection(S_[i]).issubset(C_):
                 C1_.append(s)
-        print_nodes("C1_", C1_)
         
         for s in set(G.S2).intersection(C_):
             if set(G.E[s]).intersection(C_):
                 C2_.append(s)
-        print_nodes("C2_", C2_)
 
-        X_ = attr(2, C1_ + C2_, G_[i])
-        print_nodes("X_", X_)
-
+        X_ = attr(2, list(set(C1_ + C2_)), G_[i])
         Z_ = set(X_).intersection(C_)
-        print_nodes("Z_", Z_)
-
+        
         S_wo_Z = [s for s in S_[i] if s not in Z_]
-        print_nodes("S_wo_Z", Z_)
-
         X_wo_Z = [s for s in X_ if s not in Z_]
-        print_nodes("W_wo_Z", X_wo_Z)
-
+        
         D_temp1, D_temp2 = [], []
         for s in set(G.S1).intersection(Z_):
             if set(G.E[s]).intersection(S_[i]).intersection(S_wo_Z):
                 D_temp1.append(s)
         for s in set(G.S2).intersection(Z_):
-            if set(G.E[s]).intersection(S_[i]).issubset(X_wo_Z + S_wo_Z):
+            if set(G.E[s]).intersection(S_[i]).issubset(S_wo_Z):
                 D_temp2.append(s)
-        D = D_temp1 + D_temp2
-        print_nodes("D", D)
-
+        D = D_temp1 + D_temp2 + X_wo_Z
         G_X = find_sub_graph(G_[i], X_)
-        print_graph('G_X', G_X)
-    
-
         L = attr(1, D, G_X)
-        print_nodes("L", L)
-
         Tr = [s for s in Z_ if s not in L]
-        print_nodes("Tr", Tr)
-
         W_[i+1] = attr(2, Tr, G_[i])
-        print_nodes(f"W_[{i+1}]", W_[i+1])
-
         S_[i+1] = [s for s in S_[i] if s not in W_[i+1]]
-        print_nodes(f"S_[{i+1}]", S_[i+1])
-
         G_[i+1] = find_sub_graph(G, S_[i+1])
-        print_graph(f"G_[{i+1}]", G_[i+1])
+
         i = i + 1
 
     W = []
-    for j in range(0, i):
+    for j in range(0, i+1):
         W = W + W_[j]
-    return W
-
-
+    
+    W = list(set(W))
+    return [s for s in G.S if s not in W]
 
 
 if __name__ == "__main__":
-    G, B = get_input(1)
+    G, B = get_input(4)
 
     winning_set = play_buchi_game(G, B)
-    print_nodes("winning set", winning_set)
+    print_nodes("winning set for player 1", winning_set)
     
